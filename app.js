@@ -1,22 +1,31 @@
-// Gabungan engine yang Anda butuhkan
-class MemoryEngine {
-    static extractWeakTopics(events) { return events.filter(e => e.type === "ERROR").map(e => e.topic || "Konsep Dasar"); }
-}
-
-class TutorEngine {
-    static respond(question) {
-        if (question.toLowerCase().includes("bantu")) return "Tentu, mari kita bahas pelan-pelan!";
-        return "Saya sedang menganalisis kebutuhan belajar Anda. Apa yang ingin dipelajari hari ini?";
-    }
-}
-
-// Logika Aplikasi Utama
-document.getElementById('send-btn').addEventListener('click', () => {
-    const input = document.getElementById('user-input').value;
+document.addEventListener('DOMContentLoaded', () => {
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
     const responseDiv = document.getElementById('ai-response');
-    
-    // Simulasi respons AI
-    const response = TutorEngine.respond(input);
-    responseDiv.innerText = response;
-    document.getElementById('user-input').value = '';
+
+    // Fungsi ini adalah 'jembatan' ke file api.js
+    async function handleSend() {
+        const question = userInput.value.trim();
+        if (!question) return;
+
+        // 1. Tampilkan pesan proses agar user tahu AI sedang bekerja
+        responseDiv.innerText = "Marleigh sedang berpikir...";
+        userInput.value = '';
+
+        try {
+            // 2. Panggil fungsi callAI dari file api.js
+            const answer = await callAI(question);
+            
+            // 3. Tampilkan jawaban dari AI
+            responseDiv.innerText = answer;
+        } catch (error) {
+            responseDiv.innerText = "Maaf, sistem sedang offline.";
+            console.error(error);
+        }
+    }
+
+    sendBtn.addEventListener('click', handleSend);
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleSend();
+    });
 });
